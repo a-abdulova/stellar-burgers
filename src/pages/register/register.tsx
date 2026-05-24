@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { RegisterUI } from '@ui-pages';
 
 import { useDispatch, useSelector } from '../../services/store';
-import { registerUser } from '../../services/slices/userSlice';
-import { selectAuthError, selectUser } from '../../services/selectors';
+import {
+  clearUserMessages,
+  registerUser
+} from '../../services/slices/userSlice';
+import { selectAuthError } from '../../services/selectors';
 
 export const Register: FC = () => {
   const [userName, setUserName] = useState('');
@@ -14,19 +17,23 @@ export const Register: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const user = useSelector(selectUser);
   const errorText = useSelector(selectAuthError);
+
+  useEffect(
+    () => () => {
+      dispatch(clearUserMessages());
+    },
+    [dispatch]
+  );
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    dispatch(registerUser({ email, password, name: userName }));
+    dispatch(registerUser({ email, password, name: userName }))
+      .unwrap()
+      .then(() => {
+        navigate('/', { replace: true });
+      });
   };
-
-  useEffect(() => {
-    if (user) {
-      navigate('/', { replace: true });
-    }
-  }, [user, navigate]);
 
   return (
     <RegisterUI

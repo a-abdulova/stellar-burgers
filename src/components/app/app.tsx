@@ -20,7 +20,13 @@ import {
   ProtectedRoute
 } from '@components';
 import { Preloader } from '@ui';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Route,
+  Routes,
+  useLocation,
+  useMatch,
+  useNavigate
+} from 'react-router-dom';
 
 import { useDispatch, useSelector } from '../../services/store';
 import {
@@ -43,6 +49,14 @@ const App = () => {
   const navigate = useNavigate();
 
   const background = location.state && location.state.background;
+
+  const feedOrderMatch = useMatch('/feed/:number');
+  const profileOrderMatch = useMatch('/profile/orders/:number');
+
+  const orderNumber =
+    feedOrderMatch?.params.number || profileOrderMatch?.params.number;
+
+  const orderModalTitle = orderNumber ? `#${orderNumber}` : '';
 
   useEffect(() => {
     dispatch(fetchIngredients());
@@ -132,7 +146,7 @@ const App = () => {
           <Route
             path='/feed/:number'
             element={
-              <Modal title='Информация о заказе' onClose={closeModal}>
+              <Modal title={orderModalTitle} onClose={closeModal}>
                 <OrderInfo />
               </Modal>
             }
@@ -142,7 +156,7 @@ const App = () => {
             element={
               <ProtectedRoute
                 component={
-                  <Modal title='Информация о заказе' onClose={closeModal}>
+                  <Modal title={orderModalTitle} onClose={closeModal}>
                     <OrderInfo />
                   </Modal>
                 }

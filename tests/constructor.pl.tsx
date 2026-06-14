@@ -48,13 +48,16 @@ test.describe('constructor page', () => {
       .getByText(bunName)
       .click();
 
-    await expect(page.getByText('Детали ингредиента')).toBeVisible();
-    await expect(page.getByRole('heading', { name: bunName })).toBeVisible();
-    await expect(page.getByText('Калории, ккал')).toBeVisible();
+    const modal = page.locator('#modals');
 
-    await page.locator('#modals button').click();
+    await expect(modal.getByText('Детали ингредиента')).toBeVisible();
+    await expect(modal.getByRole('heading', { name: bunName })).toBeVisible();
+    await expect(modal.getByText('Калории, ккал')).toBeVisible();
 
-    await expect(page.getByText('Детали ингредиента')).not.toBeVisible();
+    await modal.locator('button').click();
+
+
+    await expect(modal.getByText('Детали ингредиента')).not.toBeVisible();
   });
 
   test('should close ingredient modal by overlay click', async ({ page }) => {
@@ -64,11 +67,17 @@ test.describe('constructor page', () => {
       .getByText(bunName)
       .click();
 
-    await expect(page.getByText('Детали ингредиента')).toBeVisible();
+    const modal = page.locator('#modals');
 
-    await page.locator('#modals > div').last().click({ position: { x: 10, y: 10 } });
+    await expect(modal.getByText('Детали ингредиента')).toBeVisible();
+    await expect(modal.getByRole('heading', { name: bunName })).toBeVisible();
 
-    await expect(page.getByText('Детали ингредиента')).not.toBeVisible();
+    await page
+    .locator('#modals > div')
+    .last()
+    .click({ position: { x: 10, y: 10 } });
+
+    await expect(modal.getByText('Детали ингредиента')).not.toBeVisible();
   });
 
   test('should create order and clear constructor', async ({ page, context }) => {
@@ -100,16 +109,18 @@ test.describe('constructor page', () => {
 
     await page.getByRole('button', { name: 'Оформить заказ' }).click();
 
-    await expect(page.getByText(orderNumber)).toBeVisible();
-    await expect(page.getByText('идентификатор заказа')).toBeVisible();
+    const modal = page.locator('#modals');
 
-    await page.locator('#modals button').click();
+    await expect(modal.getByText(orderNumber)).toBeVisible();
+    await expect(modal.getByText('идентификатор заказа')).toBeVisible();
 
-    await expect(page.getByText(orderNumber)).not.toBeVisible();
+    await modal.locator('button').click();
+
+    await expect(modal.getByText(orderNumber)).not.toBeVisible();
     await expect(page.getByText('Выберите начинку')).toBeVisible();
     await expect(page.getByText('Выберите булки').first()).toBeVisible();
 
     await context.clearCookies();
     await page.evaluate(() => localStorage.clear());
-  });
+    });
 });
